@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>幸運拉霸機 🎰</title>
+  <title>幸運抽獎機 🎰</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400;1,600&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet" />
@@ -11,14 +11,26 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand-en">Lucky Slot Machine</div>
+    <div class="brand-en">Lucky Draw Machine</div>
     <h1 class="brand">
       <span class="cloud"></span>
-      幸運拉霸
+      幸運抽獎
       <span class="cloud"></span>
     </h1>
     <div class="brand-sub">
       拉<span class="divider">・</span>一<span class="divider">・</span>拉<span class="divider">・</span>手<span class="divider">・</span>氣
+    </div>
+
+    <!-- Tab 切換 -->
+    <div class="mode-tabs" role="tablist">
+      <button class="mode-tab active" data-mode="slot" role="tab" type="button">
+        <span class="tab-emoji">🎰</span>
+        <span class="tab-text">拉霸機</span>
+      </button>
+      <button class="mode-tab" data-mode="wheel" role="tab" type="button">
+        <span class="tab-emoji">🎡</span>
+        <span class="tab-text">轉盤</span>
+      </button>
     </div>
   </header>
 
@@ -53,6 +65,16 @@
         <button class="add-prize-btn" id="add-prize" type="button">
           <span>＋</span> 新增獎項
         </button>
+
+        <!-- 轉盤專用：中獎後是否移除 -->
+        <label class="toggle-row" id="remove-after-win-row">
+          <div class="toggle-text">
+            <div class="toggle-title">中獎後從轉盤移除</div>
+            <div class="toggle-sub">關閉則允許同一人重複中獎（僅轉盤模式）</div>
+          </div>
+          <input type="checkbox" id="remove-after-win" checked />
+          <span class="toggle-switch"></span>
+        </label>
       </section>
 
       <section class="card card-actions">
@@ -63,9 +85,11 @@
       </section>
     </aside>
 
-    <!-- 右側：拉霸機 -->
+    <!-- 右側：拉霸機 / 轉盤 -->
     <section class="panel panel-machine">
-      <div class="machine">
+      <!-- 拉霸機模式 -->
+      <div class="mode-panel active" data-mode="slot">
+        <div class="machine">
         <!-- 招牌 -->
         <div class="machine-top">
           <div class="mascot">🐯</div>
@@ -124,6 +148,38 @@
             <div class="lever-stick"></div>
             <div class="lever-base"></div>
           </button>
+        </div>
+        </div>
+      </div>
+
+      <!-- 轉盤模式 -->
+      <div class="mode-panel" data-mode="wheel">
+        <div class="wheel-stage">
+          <div class="wheel-marquee">
+            <div class="marquee-title">
+              <span class="deco"></span>
+              LUCKY WHEEL
+              <span class="deco"></span>
+            </div>
+            <div id="wheel-current-prize" class="current-prize">請設定獎項並點擊轉盤</div>
+          </div>
+
+          <div class="wheel-container">
+            <div class="wheel-pointer" aria-hidden="true"></div>
+            <div class="wheel-wrap">
+              <svg class="wheel-svg" id="wheel-svg" viewBox="-200 -200 400 400" preserveAspectRatio="xMidYMid meet"></svg>
+              <button class="wheel-hub" id="wheel-hub" type="button" aria-label="點擊轉盤">
+                <span class="hub-text">轉</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="result-display" id="wheel-result-display">
+            <div class="result-label">WINNER<span class="zh">・中獎者</span></div>
+            <div class="result-name" id="wheel-result-name">— — —</div>
+          </div>
+
+          <div class="wheel-hint">💡 點擊中心圓鈕 或 按空白鍵旋轉</div>
         </div>
       </div>
 
@@ -208,7 +264,7 @@
   </footer>
 
   <div class="celebration" id="celebration" aria-hidden="true"></div>
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-hidden="true"></div>
 
   <script src="app.js"></script>
 </body>
