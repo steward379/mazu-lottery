@@ -60,7 +60,9 @@
   // 轉盤狀態
   let wheelRotation = 0; // 累積角度
   let wheelAvailable = []; // 轉盤上目前仍可抽的名字
-
+  let wheelSpinning = false;
+  /** 轉盤模式：各獎項已抽出幾位（與拉霸共用 state.winners / drawnNames 分開追蹤） */
+  const wheelPrizeProgress = new Map();
 
   // ---------- Toast ----------
   let toastTimer = null;
@@ -185,8 +187,31 @@
     el.startDraw.disabled = !canStart;
     el.lever.disabled = !canStart;
 
-    if (currentMode === 'slot' && hasParticipants && hasPrizes && available < totalNeeded) {
+    if (
+      currentMode === 'slot' &&
+      hasParticipants &&
+      hasPrizes &&
+      available < totalNeeded &&
+      !(state.winners.length === state.prizes.length && state.prizes.length > 0 && !state.isDrawing)
+    ) {
       el.startDraw.title = `參加人數不足（需 ${totalNeeded} 人，剩 ${available} 人）`;
+    } else if (
+      currentMode === 'slot' &&
+      hasParticipants &&
+      hasPrizes &&
+      !state.isDrawing &&
+      state.winners.length === state.prizes.length &&
+      state.prizes.length > 0
+    ) {
+      el.startDraw.title = '本局已抽完，請切換「轉盤 / 拉霸」分頁或按重置後再抽';
+    } else if (
+      currentMode === 'wheel' &&
+      hasParticipants &&
+      hasPrizes &&
+      !wheelSpinning &&
+      getCurrentWheelPrize() === null
+    ) {
+      el.startDraw.title = '本局獎項已抽完，請切換分頁或按重置後再抽';
     } else {
       el.startDraw.title = '';
     }
@@ -433,15 +458,59 @@
   // ===========================================================
   //                     Tab 切換
   // ===========================================================
+  /** 切換遊戲模式時清空本局進度（保留名單與獎項設定），避免 drawnNames / 轉盤進度殘留導致按鈕永遠無法抽 */
+  function resetDrawSessionPreserveForm() {
+    state.drawnNames.clear();
+    wheelPrizeProgress.clear();
+    state.winners = [];
+    state.isDrawing = false;
+    wheelSpinning = false;
+    wheelRotation = 0;
+    if (el.wheelSvg) {
+      el.wheelSvg.style.transition = 'none';
+      el.wheelSvg.style.transform = 'rotate(0deg)';
+    }
+    el.currentPrize.textContent = '請設定獎項並拉下拉桿';
+    el.currentPrize.classList.remove('active');
+    el.resultName.textContent = '— — —';
+    el.resultName.classList.remove('win');
+    el.resultDisplay.classList.remove('win');
+    el.reelsFrame.classList.remove('jackpot');
+    el.payline.classList.remove('active');
+    el.windows.forEach((w) => w.classList.remove('win'));
+    el.reels.forEach((r) => {
+      const track = r.querySelector('.reel-track');
+      if (track) track.innerHTML = '<div class="reel-item">❓</div>';
+    });
+    if (el.wheelCurrentPrize) {
+      el.wheelCurrentPrize.textContent = '請設定獎項並點擊轉盤';
+      el.wheelCurrentPrize.classList.remove('active');
+    }
+    if (el.wheelResultName) {
+      el.wheelResultName.textContent = '— — —';
+      el.wheelResultName.classList.remove('win');
+    }
+    if (el.wheelResultDisplay) {
+      el.wheelResultDisplay.classList.remove('win');
+    }
+    el.wheelWrap?.classList.remove('spinning');
+    if (el.wheelHub) el.wheelHub.disabled = false;
+    refreshWheelAvailable();
+    drawWheel();
+    renderWinners();
+    updateStartButton();
+  }
+
   el.modeTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const mode = tab.dataset.mode;
-      if (mode === currentMode || state.isDrawing) return;
+      if (mode === currentMode || state.isDrawing || wheelSpinning) return;
       switchMode(mode);
     });
   });
 
   function switchMode(mode) {
+    resetDrawSessionPreserveForm();
     currentMode = mode;
     el.modeTabs.forEach((t) => {
       t.classList.toggle('active', t.dataset.mode === mode);
@@ -603,7 +672,6 @@
   // ===========================================================
   //                     轉盤旋轉動畫
   // ===========================================================
-  let wheelSpinning = false;
 
   async function spinWheel() {
     if (wheelSpinning) return;
@@ -696,9 +764,6 @@
     // 狀態更新
     updateStartButton();
   }
-
-  // 追蹤轉盤每個獎項已抽出幾位
-  const wheelPrizeProgress = new Map();
 
   function getCurrentWheelPrize() {
     // 找第一個還沒抽滿的獎項
