@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>拉霸抽獎機</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Noto+Serif+TC:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">★</span>
+      <span class="brand-name">LUCKY&nbsp;SLOT</span>
+      <span class="brand-mark">★</span>
+    </div>
+    <div class="brand-sub">拉 ・ 霸 ・ 抽 ・ 獎 ・ 機</div>
+  </header>
+
+  <main class="layout">
+    <!-- 左側：設定區 -->
+    <aside class="panel panel-config">
+      <section class="card">
+        <h2 class="card-title"><span class="num">01</span>參加者名單</h2>
+        <p class="hint">一行一個名字，空白行會自動忽略</p>
+        <textarea
+          id="participants"
+          placeholder="王小明&#10;陳美麗&#10;林大華&#10;張雅婷&#10;李志強"
+          spellcheck="false"
+        ></textarea>
+        <div class="meta">
+          <span id="participant-count">0</span> 人參加
+          <button class="ghost-btn" id="clear-participants" type="button">清空</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title"><span class="num">02</span>獎項設定</h2>
+        <div id="prizes-list" class="prizes-list"></div>
+        <button class="add-prize-btn" id="add-prize" type="button">
+          <span>＋</span> 新增獎項
+        </button>
+      </section>
+
+      <section class="card card-actions">
+        <button class="primary-btn" id="start-draw" type="button" disabled>
+          開始抽獎
+        </button>
+        <button class="ghost-btn full" id="reset-all" type="button">重置全部</button>
+      </section>
+    </aside>
+
+    <!-- 右側：拉霸機 -->
+    <section class="panel panel-machine">
+      <div class="machine">
+        <div class="machine-top">
+          <div class="bulb-strip">
+            <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+            <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+            <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+            <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+          </div>
+          <div class="marquee">
+            <div class="marquee-title">JACKPOT</div>
+            <div id="current-prize" class="current-prize">請設定獎項並開始抽獎</div>
+          </div>
+          <div class="bulb-strip">
+            <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+            <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+            <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+            <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+          </div>
+        </div>
+
+        <div class="machine-body">
+          <div class="reels-frame">
+            <div class="reel-window">
+              <div class="reel" id="reel-1">
+                <div class="reel-track">
+                  <div class="reel-item">？</div>
+                </div>
+              </div>
+            </div>
+            <div class="reel-window">
+              <div class="reel" id="reel-2">
+                <div class="reel-track">
+                  <div class="reel-item">？</div>
+                </div>
+              </div>
+            </div>
+            <div class="reel-window">
+              <div class="reel" id="reel-3">
+                <div class="reel-track">
+                  <div class="reel-item">？</div>
+                </div>
+              </div>
+            </div>
+            <div class="payline"></div>
+          </div>
+
+          <div class="result-display" id="result-display">
+            <div class="result-label">中獎者</div>
+            <div class="result-name" id="result-name">— — —</div>
+          </div>
+        </div>
+
+        <div class="machine-bottom">
+          <button class="lever" id="lever" type="button" aria-label="拉霸拉桿">
+            <div class="lever-ball"></div>
+            <div class="lever-stick"></div>
+            <div class="lever-base"></div>
+          </button>
+          <div class="coin-slot">
+            <div class="slot-line"></div>
+            <span>INSERT&nbsp;LUCK</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中獎名單 -->
+      <div class="winners-panel">
+        <div class="winners-header">
+          <h3>中獎名單</h3>
+          <button class="ghost-btn" id="copy-winners" type="button" disabled>複製名單</button>
+        </div>
+        <div id="winners-list" class="winners-list">
+          <div class="empty-state">尚未開獎</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 中獎特效 -->
+  <div class="celebration" id="celebration" aria-hidden="true"></div>
+
+  <!-- Toast 提示 -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
