@@ -12,3 +12,5 @@ Thumbs.db
 # 暫存
 *.log
 *.tmp
+
+.history
