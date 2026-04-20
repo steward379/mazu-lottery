@@ -149,6 +149,30 @@ body::after {
   }
 }
 
+.site-footer {
+  position: relative;
+  z-index: 10;
+  padding: 8px 24px 28px;
+  text-align: center;
+}
+
+.line-at-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.line-at-link:hover {
+  color: #06c755;
+  border-bottom-color: rgba(6, 199, 85, 0.35);
+}
+
 .panel {
   display: flex;
   flex-direction: column;
